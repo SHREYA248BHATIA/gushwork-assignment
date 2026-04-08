@@ -223,6 +223,58 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'ArrowRight') goTo(currentIdx + 1);
   });
 
+  // Mobile swipe support for main product images
+  if (carouselStage) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDX     = 0;
+    let touchLocked = false;
+
+    const MIN_SWIPE_PX = 40;
+    const LOCK_DELTA_PX = 10;
+
+    const isButtonTarget = (t) => Boolean(t?.closest && t.closest('button'));
+
+    carouselStage.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) return;
+      if (isButtonTarget(e.target)) return; // avoid hijacking button taps
+
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchDX = 0;
+      touchLocked = false;
+    }, { passive: true });
+
+    carouselStage.addEventListener('touchmove', e => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      touchDX = dx;
+
+      if (!touchLocked) {
+        // Lock into horizontal swipe only when it clearly dominates vertical movement
+        if (Math.abs(dx) > LOCK_DELTA_PX && Math.abs(dx) > Math.abs(dy)) {
+          touchLocked = true;
+        }
+      }
+
+      if (touchLocked) e.preventDefault();
+    }, { passive: false });
+
+    const end = () => {
+      if (!touchLocked) return;
+      if (Math.abs(touchDX) < MIN_SWIPE_PX) return;
+      // Finger swipes left => go to next image
+      touchDX < 0 ? goTo(currentIdx + 1) : goTo(currentIdx - 1);
+      touchLocked = false;
+    };
+
+    carouselStage.addEventListener('touchend', end, { passive: true });
+    carouselStage.addEventListener('touchcancel', end, { passive: true });
+  }
+
   buildThumbs();
 
   /* ═══════════════════════════════════════════════
@@ -401,6 +453,50 @@ document.addEventListener('DOMContentLoaded', () => {
         wheelAccum = 0;
       }
     }, { passive: false });
+
+    // Mobile swipe support (touch drag -> discrete next/prev)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDX = 0;
+    let touchLocked = false;
+
+    const LOCK_DELTA_PX = 10;
+
+    wrap.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchDX = 0;
+      touchLocked = false;
+    }, { passive: true });
+
+    wrap.addEventListener('touchmove', e => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      touchDX = dx;
+
+      if (!touchLocked) {
+        if (Math.abs(dx) > LOCK_DELTA_PX && Math.abs(dx) > Math.abs(dy)) {
+          touchLocked = true;
+        }
+      }
+
+      if (touchLocked) e.preventDefault();
+    }, { passive: false });
+
+    const end = () => {
+      if (!touchLocked) return;
+      const threshold = Math.max(40, CARD_W * 0.15);
+      if (Math.abs(touchDX) < threshold) return;
+      touchDX < 0 ? next() : prev();
+      touchLocked = false;
+    };
+
+    wrap.addEventListener('touchend', end, { passive: true });
+    wrap.addEventListener('touchcancel', end, { passive: true });
   })();
 
   /* ═══════════════════════════════════════════════
@@ -552,6 +648,50 @@ document.addEventListener('DOMContentLoaded', () => {
         wheelAccum = 0;
       }
     }, { passive: false });
+
+    // Mobile swipe support (touch drag -> discrete next/prev)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchDX = 0;
+    let touchLocked = false;
+
+    const LOCK_DELTA_PX = 10;
+
+    wrap.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchDX = 0;
+      touchLocked = false;
+    }, { passive: true });
+
+    wrap.addEventListener('touchmove', e => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      touchDX = dx;
+
+      if (!touchLocked) {
+        if (Math.abs(dx) > LOCK_DELTA_PX && Math.abs(dx) > Math.abs(dy)) {
+          touchLocked = true;
+        }
+      }
+
+      if (touchLocked) e.preventDefault();
+    }, { passive: false });
+
+    const end = () => {
+      if (!touchLocked) return;
+      const threshold = Math.max(40, CARD_W * 0.15);
+      if (Math.abs(touchDX) < threshold) return;
+      touchDX < 0 ? next() : prev();
+      touchLocked = false;
+    };
+
+    wrap.addEventListener('touchend', end, { passive: true });
+    wrap.addEventListener('touchcancel', end, { passive: true });
   })();
 
   /* ═══════════════════════════════════════════════
