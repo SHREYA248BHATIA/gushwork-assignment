@@ -746,7 +746,9 @@ p  { color: var(--text-gray); line-height: 1.7; }
 /* Scroll track (overflows left edge) */
 .apps-track-wrap {
   padding-left: 24px; /* match container left */
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 .apps-track {
   display: flex;
@@ -989,10 +991,12 @@ p  { color: var(--text-gray); line-height: 1.7; }
 
 .testi-track-wrap {
   padding-left: 24px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   outline: none;
   border-radius: 4px;
   /* Subtle focus ring when navigating with keyboard */
+  -webkit-overflow-scrolling: touch;
 }
 .testi-track-wrap:focus-visible {
   box-shadow: 0 0 0 3px rgba(43, 57, 144, 0.35);
